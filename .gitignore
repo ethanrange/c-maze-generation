@@ -38,3 +38,6 @@ emulator
 
 #ignore vscode settings
 .vscode/*
+
+#ignore macOS files
+.DS_Store
