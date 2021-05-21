@@ -18,6 +18,9 @@
 emulate
 assemble
 
+#emulator shouldn't compile but Makefile is wrong
+emulator
+
 #ignore junk files from compiling Haskell code
 *.hi
 
@@ -33,3 +36,5 @@ assemble
 *.nav
 *.toc
 
+#ignore vscode settings
+.vscode/*
