@@ -34,7 +34,7 @@ assemble
 *.toc
 
 #ignore vscode settings
-.vscode/*
+.vscode
 
 #ignore macOS files
 .DS_Store
