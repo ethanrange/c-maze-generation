@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+#
+#	summarisetests:
+#		intended to summarise a number of test results,
+#		(eg. from testlist.c), in a prove-like format.
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+my $ntests = 0;
+my $nok = 0;
+my $nfail = 0;
+my $ok;
+my $fail;
+
+
+sub processline
+{
+	my( $l, $prog, $max ) = @_;
+
+	if( $l =~ s/^T\s+// )
+	{
+		$ntests++;
+		if( $l =~ s/:\s+ok$//i )
+		{
+			$nok++;
+			if( ! defined $max || $nok < $max )
+			{
+				$ok .= "  $prog $l";
+			} elsif( defined $max && $nok == $max )
+			{
+				$ok .= "  ....\n";
+			}
+		} else
+		{
+			$nfail++;
+			$fail .= "  $prog $l";
+		}
+	}
+}
+
+my $max;
+GetOptions( "max=i" => \$max ) ||
+	die "Usage: summarisetests [--max N] testprograms\n".
+            "or\ttestprogram | summarisetests [--max N]\n";
+
+if( @ARGV )
+{
+	# run each program, summarising it's output..
+	foreach my $testprog (@ARGV)
+	{
+		open( my $infh, '-|', $testprog ) || die "can't run $testprog\n";
+		while( <$infh> )
+		{
+			processline( $_, $testprog, $max );
+		}
+		$infh->close;
+	}
+} else
+{
+	while( <> )
+	{
+		processline( $_, '', $max );
+	}
+}
+if( $nfail == 0 )
+{
+	print "$ntests tests: all $nok pass\n";
+	print "passes:\n$ok";
+} else
+{
+	print "$ntests tests: $nok pass, $nfail fail\n";
+	print "failures:\n$fail\npasses:\n$ok";
+}
