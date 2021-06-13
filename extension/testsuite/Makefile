@@ -1,20 +1,16 @@
-TOOLDIR =       ./testutils
-INSTDIR =       $(TOOLDIR)
-INCDIR  =       $(INSTDIR)/include
-LIBDIR  =       $(INSTDIR)/lib/$(ARCH)
-CC      =       gcc
-CFLAGS  =       -Wall -I$(INCDIR)
-LDLIBS  =       -L$(LIBDIR) -ltestlib
-#LIBOBJS	=	.o
-BUILD	=	testmaze $(LIB)
+CC      =   gcc 
+CFLAGS  =   -Wall
+BUILD	=	testmaze
 
-all:	$(BUILD)
+all: 
+	$(BUILD)
 
 clean:
-	/bin/rm -f $(BUILD) *.o core
+	rm -f $(BUILD) *.o core
 
-test:	$(BUILD)
-	cd testutils;make clean && make; cd ..; summarisetests ./testmaze
+test: $(BUILD)
+	summarisetests ./testmaze
 
-testmaze:	testmaze.o 
-testmaze.o:	testmaze.c
+testmaze:    testmaze.o testutils.o
+testmaze.o:  testmaze.c testutils.h
+testutils.o: testutils.c testutils.h

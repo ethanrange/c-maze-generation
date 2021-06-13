@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "./testutils/testutils.h"
+#include "testutils.h"
 
 int main( void )
 {
