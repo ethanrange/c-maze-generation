@@ -38,3 +38,6 @@ assemble
 
 #ignore macOS files
 .DS_Store
+
+#ignore .a files to prevent cross platform raylib issues
+*.a
