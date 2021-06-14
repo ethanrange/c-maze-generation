@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define ROWS 25
 #define COLS 51
@@ -22,6 +23,7 @@ typedef enum TileType {
 typedef struct Tile {
   Vector2 position;
   TileType type;
+  int id;
 } Tile;
 
 typedef struct Player {
@@ -45,13 +47,23 @@ static Vector2 player_size = {0};
 Tile *walls[ROWS * COLS] = {0};
 int wall_index = 0;
 
-int remaining_tiles = 0;
+int parent[ROWS * COLS] = {0};
 
 static void init_game(void);
 static void update_game(void);
 static void draw_game(void);
 static void unload_game(void);
 static void update_draw_frame(void);
+
+int run = 0;
+
+static int get_id(int id) {
+  while (parent[id]) {
+    id = parent[id];
+  }
+
+  return id;
+}
 
 static void remove_element(int index) {
   // Shift elements down
@@ -120,6 +132,13 @@ bool valid_pos(int x, int y) {
   return (tile->type != WALL);
 }
 
+void init_prims(void) {
+  init_game();
+
+  Vector2 coords = coords_from_pos(player.position.x, player.position.y);
+  add_element(&tile[(int)coords.y][(int)coords.x]);
+}
+
 void step_prims(void) {
   int random_index = rand() % wall_index;
   Tile *random_wall = walls[random_index];
@@ -164,19 +183,93 @@ void step_prims(void) {
 }
 
 void run_prims(void) {
-  // init_game();
+  init_prims();
 
-  while (remaining_tiles) {
+  while (wall_index) {
     step_prims();
-    remaining_tiles--;
   }
 }
+
+void init_kruskals(void) {
+  init_game();
+
+  // Add horizontal walls to walls list
+  for (int i = 1; i < ROWS - 1; i += 2) {
+    for (int j = 2; j < COLS - 2; j += 2) {
+      add_element(&tile[i][j]);
+    }
+  }
+
+  // Add vertical walls to walls list
+  for (int i = 2; i < ROWS - 2; i += 2) {
+    for (int j = 1; j < COLS - 1; j += 2) {
+      add_element(&tile[i][j]);
+    }
+  }
+
+  printf("Walls index: %i\n", wall_index);
+}
+
+void step_kruskals(void) {
+  int random_index = rand() % wall_index;
+  Tile *random_wall = walls[random_index];
+
+  Vector2 coords =
+      coords_from_pos(random_wall->position.x, random_wall->position.y);
+
+  Tile *neighbours[2];
+  int neighbours_index = 0;
+
+  // Add neighbouring tiles
+  for (int i = -1; i < 2; i++) {
+    for (int j = -1; j < 2; j++) {
+      if (abs(i) + abs(j) == 1 &&
+          (coords.y + i >= 0 && (int)coords.y + i < ROWS) &&
+          (coords.x + j >= 0 && (int)coords.x + j < COLS)) {
+
+        Tile *neighbour = &tile[(int)coords.y + i][(int)coords.x + j];
+
+        if (neighbour->type != WALL) {
+          neighbours[neighbours_index] = neighbour;
+          neighbours_index++;
+        }
+      }
+    }
+  }
+
+  // Union ids
+  int neighbour0_id = get_id(neighbours[0]->id);
+  int neighbour1_id = get_id(neighbours[1]->id);
+  int wall_id = get_id(random_wall->id);
+
+  if (neighbour0_id != neighbour1_id) {
+    random_wall->type = PASSAGE;
+
+    if (neighbour0_id < neighbour1_id) {
+      parent[neighbour1_id] = neighbour0_id;
+      parent[wall_id] = neighbour0_id;
+    } else {
+      parent[neighbour0_id] = neighbour1_id;
+      parent[wall_id] = neighbour1_id;
+    }
+  }
+
+  remove_element(random_index);
+}
+
+void run_kruskals(void) {
+  init_kruskals();
+
+  while (wall_index) {
+    step_kruskals();
+  }
+}
+
+void (*run_types[3])() = {NULL, step_prims, step_kruskals};
 
 void init_game(void) {
   tile_size = (Vector2){40, 40};
   player_size = (Vector2){40, 40};
-
-  remaining_tiles = ((ROWS - 1) / 2) * ((COLS - 1) / 2);
 
   // Initialize tiles
 
@@ -191,10 +284,16 @@ void init_game(void) {
           j % 2 == 0) {
         tile[i][j].type = WALL;
       }
+
+      tile[i][j].id = COLS * i + j;
     }
   }
 
+  // Logically clear walls array
   wall_index = 0;
+
+  // Reset parent array
+  memset(parent, 0, sizeof(parent));
 
   while (true) {
     int i = ROWS - 2; //((double)rand() / (double)RAND_MAX) * (ROWS - 2) + 1;
@@ -206,16 +305,9 @@ void init_game(void) {
 
       tile[i][j].type = START;
 
-      add_element(&tile[i][j]);
-
       break;
     }
   }
-
-  run_prims();
-
-  // Set goal
-  tile[1][COLS - 2].type = GOAL;
 }
 
 // Update game (one frame)
@@ -229,10 +321,30 @@ void update_game(void) {
     // Step generation function
     if (IsKeyPressed('W')) {
       if (IsKeyDown(KEY_LEFT_SHIFT)) {
-        step_prims();
+        run = run ? 0 : 1;
+        init_prims();
+      } else if (IsKeyDown(KEY_LEFT_CONTROL)) {
+        init_prims();
       } else {
         run_prims();
       }
+    } else if (IsKeyPressed('K')) {
+      if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        run = run ? 0 : 2;
+        init_kruskals();
+      } else if (IsKeyDown(KEY_LEFT_CONTROL)) {
+        init_kruskals();
+      } else {
+        run_kruskals();
+      }
+    }
+
+    if (run && wall_index) {
+      (*run_types[run])();
+      // step_prims();
+      // step_kruskals();
+    } else {
+      run = 0;
     }
 
     if (IsKeyPressed('R')) {
@@ -241,11 +353,14 @@ void update_game(void) {
       return;
     }
 
-    // Vector2 position = GetMousePosition();
+    Vector2 position = GetMousePosition();
 
-    // if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    //   tile_from_pos(position.x, position.y)->col = 2;
-    // }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      Vector2 coords = coords_from_pos(position.x, position.y);
+      Tile *selected = tile_from_pos(position.x, position.y);
+      printf("Id: %i Type: %i Coords: %i %i\n", get_id(selected->id),
+             selected->type, (int)coords.x, (int)coords.y);
+    }
 
     // Refactor to a switch?
     if (IsKeyPressed(KEY_UP)) {
