@@ -41,3 +41,6 @@ assemble
 
 #ignore .a files to prevent cross platform raylib issues
 *.a
+
+#ignore compiled extension file
+main
