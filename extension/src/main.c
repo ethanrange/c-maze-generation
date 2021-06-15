@@ -11,20 +11,23 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool game_over = false;
-static bool pause = false;
-
 static Tile tile[ROWS][COLS] = {0};
 
 static Player player = {0};
 
-static int run = 0;
+static RunState run = HALT;
 static int remaining = 0;
+
+static int (*step_funcs[5])() = {NULL, step_prims, step_kruskals, NULL,
+                                 step_dijkstras};
+static void (*init_funcs[5])() = {NULL, init_prims, init_kruskals, NULL,
+                                  init_dijkstras};
+static void (*run_funcs[5])() = {NULL, run_prims, run_kruskals, NULL,
+                                 run_dijkstras};
 
 static void init_game(void);
 static void update_game(void);
 static void draw_game(void);
-static void unload_game(void);
 static void update_draw_frame(void);
 
 int main(void) {
@@ -45,45 +48,61 @@ int main(void) {
     update_draw_frame();
   }
 
-  unload_game();
-
   CloseWindow();
 
   return EXIT_SUCCESS;
 }
 
-static int step_algorithm(int type) {
-  switch (type) {
-  case 1:
-    return step_prims(tile);
-  case 2:
-    return step_kruskals(tile);
-  case 3:
-    return step_dijkstras(tile);
-  default:
-    return 0;
+static void init_algorithm(RunState type) {
+  // Initialise remaining to non-zero value
+  remaining = 1;
+
+  // Reset board for generation algorithms
+  if (type != DIJKSTRA) {
+    init_game();
+  }
+
+  if (init_funcs[type]) {
+    (*init_funcs[type])(tile, player);
   }
 }
 
-static void init_algorithm(int type) {
-  remaining = 1; // Initialise to non-zero
-
-  if (type == 3) {
-    init_dijkstras(tile, player);
-    return;
+static int step_algorithm(RunState type) {
+  if (step_funcs[type]) {
+    return (*step_funcs[type])(tile);
   }
 
-  init_game();
+  return 0;
+}
 
-  switch (type) {
-  case 0:
-    init_prims(tile, player);
-    break;
-  case 1:
-    init_kruskals(tile);
-    break;
+static void run_algorithm(RunState type) {
+  if (run_funcs[type]) {
+    return (*run_funcs[type])(tile);
   }
 }
+
+static void handle_movement(int x_delta, int y_delta) {
+  if (valid_pos(tile, player.position.x + x_delta,
+                player.position.y + y_delta)) {
+    player.position.x += x_delta;
+    player.position.y += y_delta;
+  }
+}
+
+static void handle_algorithm(RunState type) {
+  // Initialise function
+  init_algorithm(type);
+
+  if (type == RECURSIVE_BACKTRACK) {
+    run_recursive_backtrack(tile, player);
+  } else {
+    if (IsKeyDown(KEY_LEFT_SHIFT)) {
+      run = run ? HALT : type;
+    } else {
+      run_algorithm(type);
+    }
+  }
+};
 
 void init_game(void) {
 
@@ -95,121 +114,90 @@ void init_game(void) {
 
       tile[i][j].type = PASSAGE;
 
+      // Set borders and grid pattern to walls
       if (!i || !j || (i == ROWS - 1) || (j == COLS - 1) || i % 2 == 0 ||
           j % 2 == 0) {
         tile[i][j].type = WALL;
       }
 
+      // Unique ID for each tile
       tile[i][j].id = COLS * i + j;
 
+      // Initialise weights to maximum
       tile[i][j].weight = __INT_MAX__;
     }
   }
 
-  while (true) {
-    int i = ROWS - 2; //((double)rand() / (double)RAND_MAX) * (ROWS - 2) + 1;
-    int j = 1;        //((double)rand() / (double)RAND_MAX) * (COLS - 2) + 1;
+  // Initialise start at bottom left tile
+  Tile *start = &tile[ROWS - 2][1];
 
-    if (tile[i][j].type == PASSAGE) {
-      player.position.x = tile[i][j].position.x;
-      player.position.y = tile[i][j].position.y;
+  player.position.x = start->position.x;
+  player.position.y = start->position.y;
 
-      tile[i][j].type = START;
-
-      break;
-    }
-  }
+  start->type = START;
 }
 
 // Update game (one frame)
 void update_game(void) {
-  if (!game_over) {
+  // Only start an algorithm if not currently running
+  if (run == HALT) {
     if (IsKeyPressed('P')) {
-      // Toggle pause
-      pause = !pause;
+      // Prims
+      handle_algorithm(PRIM);
+    } else if (IsKeyPressed('K')) {
+      // Kruskals
+      handle_algorithm(KRUSKAL);
+    } else if (IsKeyPressed('B')) {
+      // Recursive backtracking
+      handle_algorithm(RECURSIVE_BACKTRACK);
+    } else if (IsKeyPressed('D')) {
+      // Dijkstras
+      handle_algorithm(DIJKSTRA);
     }
+  }
 
-    // Only start an algorithm if not currently running
-    if (!run) {
-      // Step generation function
-      if (IsKeyPressed('W')) {
-        init_algorithm(0);
-
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
-          run = run ? 0 : 1;
-        } else {
-          run_prims(tile, player);
-        }
-      } else if (IsKeyPressed('K')) {
-        init_algorithm(1);
-
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
-          run = run ? 0 : 2;
-        } else {
-          run_kruskals(tile);
-        }
-      } else if (IsKeyPressed('B')) {
-        init_algorithm(2);
-        run_recursive_backtrack(tile, player);
-      } else if (IsKeyPressed('D')) {
-        init_algorithm(3);
-
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
-          run = run ? 0 : 3;
-        } else {
-          run_dijkstras(tile, player);
-        }
-      }
-    }
-
-    if (run && remaining) {
+  if (run != HALT) {
+    if (remaining) {
       remaining = step_algorithm(run);
     } else {
-      run = 0;
+      run = HALT;
     }
+  }
 
-    if (IsKeyPressed('R')) {
-      // Reload maze
-      run = 0; // stop any current runs
-      init_game();
-      return;
-    }
+  // Reload maze
+  if (IsKeyPressed('R')) {
+    // Stop any current runs
+    run = HALT;
 
+    // Reinitialise game
+    init_game();
+    return;
+  }
+
+  // Handle player movement
+  if (IsKeyPressed(KEY_UP)) {
+    handle_movement(0, -tile_size.y);
+  } else if (IsKeyPressed(KEY_DOWN)) {
+    handle_movement(0, tile_size.y);
+  } else if (IsKeyPressed(KEY_LEFT)) {
+    handle_movement(-tile_size.x, 0);
+  } else if (IsKeyPressed(KEY_RIGHT)) {
+    handle_movement(tile_size.x, 0);
+  }
+
+  // Set goal on click
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     Vector2 position = GetMousePosition();
+    Tile *selected = tile_from_pos(tile, position.x, position.y);
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-      // Vector2 coords = coords_from_pos(position.x, position.y);
-      Tile *selected = tile_from_pos(tile, position.x, position.y);
-
-      selected->type = GOAL;
-      // printf("Weight: %i Type: %i Coords: %i %i\n", selected->weight,
-      //        selected->type, (int)coords.x, (int)coords.y);
-    }
-
-    // Refactor to a switch?
-    if (IsKeyPressed(KEY_UP)) {
-      if (valid_pos(tile, player.position.x, player.position.y - tile_size.y)) {
-        player.position.y -= tile_size.y;
-      }
-    } else if (IsKeyPressed(KEY_DOWN)) {
-      if (valid_pos(tile, player.position.x, player.position.y + tile_size.y)) {
-        player.position.y += tile_size.y;
-      }
-    } else if (IsKeyPressed(KEY_LEFT)) {
-      if (valid_pos(tile, player.position.x - tile_size.x, player.position.y)) {
-        player.position.x -= tile_size.x;
-      }
-    } else if (IsKeyPressed(KEY_RIGHT)) {
-      if (valid_pos(tile, player.position.x + tile_size.x, player.position.y)) {
-        player.position.x += tile_size.x;
-      }
-    }
+    selected->type = GOAL;
   }
 }
 
 void draw_game(void) {
   BeginDrawing();
 
+  // Set blank background
   ClearBackground(RAYWHITE);
 
   // Draw tiles
@@ -221,20 +209,12 @@ void draw_game(void) {
     }
   }
 
-  if (!pause) {
-    DrawRectangle(player.position.x - 20, player.position.y - 20, 40, 40, RED);
-  } else {
-    DrawText(FormatText("Pos %i %i", GetMouseX(), GetMouseY()),
-             screen_width / 2 - MeasureText("GAME PAUSED", 40) / 2,
-             screen_height / 2 - 40, 40, WHITE);
-  }
+  // Draw player
+  DrawRectangle(player.position.x - player_size.x / 2,
+                player.position.y - player_size.y / 2, player_size.x,
+                player_size.y, RED);
 
   EndDrawing();
-}
-
-// Unload game variables
-void unload_game(void) {
-  // TODO: Unload all dynamic loaded data (textures, sounds, models...)
 }
 
 // Update and Draw (one frame)

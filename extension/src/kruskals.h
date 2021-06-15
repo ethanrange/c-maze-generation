@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-void init_kruskals(Tile tile[ROWS][COLS]);
+void init_kruskals(Tile tile[ROWS][COLS], Player player);
 
 int step_kruskals(Tile tile[ROWS][COLS]);
 

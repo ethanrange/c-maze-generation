@@ -9,10 +9,7 @@ static void recursive_backtrack(Tile tile[ROWS][COLS], Tile *current) {
   // Add neighbouring tiles
   for (int i = -2; i < 3; i += 2) {
     for (int j = -2; j < 3; j += 2) {
-      if (abs(i) + abs(j) == 2 &&
-          (coords.y + i >= 0 && (int)coords.y + i < ROWS) &&
-          (coords.x + j >= 0 && (int)coords.x + j < COLS)) {
-
+      if (valid_tile(i, j, coords, 2)) {
         Tile *neighbour = &tile[(int)coords.y + i][(int)coords.x + j];
 
         if (neighbour->type != WALL) {
@@ -24,10 +21,12 @@ static void recursive_backtrack(Tile tile[ROWS][COLS], Tile *current) {
 
   current->type = VISITED;
 
+  // Select univisted neighbours in a random order and recurse
   while (neighbours_index) {
     int neighbour_index = rand() % neighbours_index;
     Tile *neighbour = neighbours[neighbour_index];
 
+    // If unvisited, remove separating wall and recurse on neighbour
     if (neighbour->type != VISITED) {
       tile_from_pos(tile, (current->position.x + neighbour->position.x) / 2,
                     (current->position.y + neighbour->position.y) / 2)
@@ -35,6 +34,7 @@ static void recursive_backtrack(Tile tile[ROWS][COLS], Tile *current) {
       recursive_backtrack(tile, neighbour);
     }
 
+    // Remove neighbour from neighbour set
     remove_element(neighbour_index, neighbours, &neighbours_index);
   }
 }
