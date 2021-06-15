@@ -15,6 +15,20 @@ void add_element(Tile *element, Tile *array[], int *size) {
   *size += 1;
 }
 
+int get_min(Tile *array[], int *size) {
+  int min_index = 0;
+  int min_weight = __INT_MAX__;
+
+  for (int i = 0; i < *size; i++) {
+    if (array[i]->weight < min_weight) {
+      min_index = i;
+      min_weight = array[i]->weight;
+    }
+  }
+
+  return min_index;
+}
+
 Vector2 coords_from_pos(int x, int y) {
   Vector2 coords = {0};
 

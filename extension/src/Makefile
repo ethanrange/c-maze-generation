@@ -90,12 +90,13 @@ endif
 # Default target entry
 all: libraylib main
 
-main: main.o prims.o kruskals.o recursive_backtrack.o utils.o
+main: main.o prims.o kruskals.o recursive_backtrack.o utils.o dijkstras.o
 
 main.o: main.c constants.h kruskals.h prims.h recursive_backtrack.h utils.h
 prims.o: prims.c utils.h constants.h
 kruskals.o: kruskals.c utils.h constants.h
 recursive_backtrack.o: recursive_backtrack.c utils.h constants.h
+dijkstras.o: dijkstras.c utils.h constants.h
 utils.o: utils.c constants.h
 
 %.o:
