@@ -119,26 +119,29 @@ void update_game(void) {
       pause = !pause;
     }
 
-    // Step generation function
-    if (IsKeyPressed('W')) {
-      init_algorithm(0);
+    // Only start an algorithm if not currently running
+    if (!run) {
+      // Step generation function
+      if (IsKeyPressed('W')) {
+        init_algorithm(0);
 
-      if (IsKeyDown(KEY_LEFT_SHIFT)) {
-        run = run ? 0 : 1;
-      } else {
-        run_prims(tile, player);
-      }
-    } else if (IsKeyPressed('K')) {
-      init_algorithm(1);
+        if (IsKeyDown(KEY_LEFT_SHIFT)) {
+          run = run ? 0 : 1;
+        } else {
+          run_prims(tile, player);
+        }
+      } else if (IsKeyPressed('K')) {
+        init_algorithm(1);
 
-      if (IsKeyDown(KEY_LEFT_SHIFT)) {
-        run = run ? 0 : 2;
-      } else {
-        run_kruskals(tile);
+        if (IsKeyDown(KEY_LEFT_SHIFT)) {
+          run = run ? 0 : 2;
+        } else {
+          run_kruskals(tile);
+        }
+      } else if (IsKeyPressed('B')) {
+        init_algorithm(2);
+        run_recursive_backtrack(tile, player);
       }
-    } else if (IsKeyPressed('B')) {
-      init_algorithm(2);
-      run_recursive_backtrack(tile, player);
     }
 
     if (run && remaining) {
@@ -149,6 +152,7 @@ void update_game(void) {
 
     if (IsKeyPressed('R')) {
       // Reload maze
+      run = 0; // stop any current runs
       init_game();
       return;
     }
