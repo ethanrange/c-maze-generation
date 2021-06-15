@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "kruskals.h"
 
 static Tile *walls[ROWS * COLS] = {0};
@@ -14,8 +16,8 @@ static int get_id(int id) {
   return id;
 }
 
-// Unused player passed to unifying types into function pointer array
-void init_kruskals(Tile tile[ROWS][COLS], Player player) {
+// Unused player argument passed to unify types into function pointer array
+void init_kruskals(Tile tiles[ROWS][COLS], Player player) {
   // Logically clear walls array
   wall_index = 0;
 
@@ -25,19 +27,19 @@ void init_kruskals(Tile tile[ROWS][COLS], Player player) {
   // Add horizontal walls to walls list
   for (int i = 1; i < ROWS - 1; i += 2) {
     for (int j = 2; j < COLS - 2; j += 2) {
-      add_element(&tile[i][j], walls, &wall_index);
+      add_element(&tiles[i][j], walls, &wall_index);
     }
   }
 
   // Add vertical walls to walls list
   for (int i = 2; i < ROWS - 2; i += 2) {
     for (int j = 1; j < COLS - 1; j += 2) {
-      add_element(&tile[i][j], walls, &wall_index);
+      add_element(&tiles[i][j], walls, &wall_index);
     }
   }
 }
 
-int step_kruskals(Tile tile[ROWS][COLS]) {
+int step_kruskals(Tile tiles[ROWS][COLS]) {
   // Select random wall
   int random_index = rand() % wall_index;
   Tile *random_wall = walls[random_index];
@@ -52,7 +54,7 @@ int step_kruskals(Tile tile[ROWS][COLS]) {
   for (int i = -1; i < 2; i++) {
     for (int j = -1; j < 2; j++) {
       if (valid_tile(i, j, coords, 1)) {
-        Tile *neighbour = &tile[(int)coords.y + i][(int)coords.x + j];
+        Tile *neighbour = &tiles[(int)coords.y + i][(int)coords.x + j];
 
         if (neighbour->type != WALL) {
           neighbours[neighbours_index] = neighbour;
@@ -83,8 +85,10 @@ int step_kruskals(Tile tile[ROWS][COLS]) {
   return wall_index;
 }
 
-void run_kruskals(Tile tile[ROWS][COLS]) {
-  while (wall_index) {
-    step_kruskals(tile);
+void run_kruskals(Tile tiles[ROWS][COLS]) {
+  assert(wall_index >= 0);
+
+  while (wall_index > 0) {
+    step_kruskals(tiles);
   }
 }
