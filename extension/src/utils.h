@@ -14,14 +14,20 @@ typedef enum TileType {
   START,
   VISITED,
   FRONTIER,
-  GOAL
+  GOAL,
+  SEARCHED,
+  PATH
 } TileType;
 
-typedef struct Tile {
+typedef struct Tile Tile;
+
+struct Tile {
+  Tile *parent;
   Vector2 position;
   TileType type;
   int id;
-} Tile;
+  int weight;
+};
 
 typedef struct Player {
   Vector2 position;
@@ -36,5 +42,7 @@ Vector2 coords_from_pos(int x, int y);
 Tile *tile_from_pos(Tile tile[ROWS][COLS], int x, int y);
 
 bool valid_pos(Tile tile[ROWS][COLS], int x, int y);
+
+int get_min(Tile *array[], int *size);
 
 #endif

@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "dijkstras.h"
 #include "kruskals.h"
 #include "prims.h"
 #include "raylib.h"
@@ -57,14 +58,22 @@ static int step_algorithm(int type) {
     return step_prims(tile);
   case 2:
     return step_kruskals(tile);
+  case 3:
+    return step_dijkstras(tile);
   default:
     return 0;
   }
 }
 
 static void init_algorithm(int type) {
-  init_game();
   remaining = 1; // Initialise to non-zero
+
+  if (type == 3) {
+    init_dijkstras(tile, player);
+    return;
+  }
+
+  init_game();
 
   switch (type) {
   case 0:
@@ -79,7 +88,6 @@ static void init_algorithm(int type) {
 void init_game(void) {
 
   // Initialize tiles
-
   for (int i = 0; i < ROWS; i++) {
     for (int j = 0; j < COLS; j++) {
       tile[i][j].position = (Vector2){j * tile_size.x + tile_size.x / 2,
@@ -93,6 +101,8 @@ void init_game(void) {
       }
 
       tile[i][j].id = COLS * i + j;
+
+      tile[i][j].weight = __INT_MAX__;
     }
   }
 
@@ -139,6 +149,14 @@ void update_game(void) {
     } else if (IsKeyPressed('B')) {
       init_algorithm(2);
       run_recursive_backtrack(tile, player);
+    } else if (IsKeyPressed('D')) {
+      init_algorithm(3);
+
+      if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        run = run ? 0 : 3;
+      } else {
+        run_dijkstras(tile, player);
+      }
     }
 
     if (run && remaining) {
@@ -153,14 +171,16 @@ void update_game(void) {
       return;
     }
 
-    // Vector2 position = GetMousePosition();
+    Vector2 position = GetMousePosition();
 
-    // if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    //   Vector2 coords = coords_from_pos(position.x, position.y);
-    //   Tile *selected = tile_from_pos(tile, position.x, position.y);
-    //   printf("Id: %i Type: %i Coords: %i %i\n", get_id(selected->id),
-    //          selected->type, (int)coords.x, (int)coords.y);
-    // }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      // Vector2 coords = coords_from_pos(position.x, position.y);
+      Tile *selected = tile_from_pos(tile, position.x, position.y);
+
+      selected->type = GOAL;
+      // printf("Weight: %i Type: %i Coords: %i %i\n", selected->weight,
+      //        selected->type, (int)coords.x, (int)coords.y);
+    }
 
     // Refactor to a switch?
     if (IsKeyPressed(KEY_UP)) {
