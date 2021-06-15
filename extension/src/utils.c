@@ -6,15 +6,19 @@ void remove_element(int index, Tile *array[], int *size) {
     array[i] = array[i + 1];
   }
 
-  // Reduce size
+  // Decrement size
   *size -= 1;
 }
 
 void add_element(Tile *element, Tile *array[], int *size) {
+  // Set next array element to element
   array[*size] = element;
+
+  // Increment size
   *size += 1;
 }
 
+// Find index of tile with smallest weight in given array
 int get_min(Tile *array[], int *size) {
   int min_index = 0;
   int min_weight = __INT_MAX__;
@@ -29,6 +33,7 @@ int get_min(Tile *array[], int *size) {
   return min_index;
 }
 
+// Find i j coordinates from x y position
 Vector2 coords_from_pos(int x, int y) {
   Vector2 coords = {0};
 
@@ -43,13 +48,23 @@ Vector2 coords_from_pos(int x, int y) {
   }
 }
 
+// Find tile at x y position
 Tile *tile_from_pos(Tile tile[ROWS][COLS], int x, int y) {
   Vector2 coords = coords_from_pos(x, y);
   return &tile[(int)coords.y][(int)coords.x];
 }
 
+// Check if desired player movement is valid
 bool valid_pos(Tile tile[ROWS][COLS], int x, int y) {
   Tile *new_tile = tile_from_pos(tile, x, y);
 
   return (new_tile->type != WALL);
+}
+
+// Generate a random integer between min and max inclusive
+int rand_int(int min, int max) { return (rand() % (max - min + 1)) + min; }
+
+bool valid_tile(int i, int j, Vector2 coords, int dist) {
+  return (abs(i) + abs(j) == dist && (coords.y + i >= 0 && coords.y + i < ROWS) &&
+          (coords.x + j >= 0 && coords.x + j < COLS));
 }
