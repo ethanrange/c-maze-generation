@@ -90,7 +90,16 @@ endif
 # Default target entry
 all: libraylib main
 
-# main: main.o
+main: main.o prims.o kruskals.o recursive_backtrack.o utils.o
+
+main.o: main.c constants.h kruskals.h prims.h recursive_backtrack.h utils.h
+prims.o: prims.c utils.h constants.h
+kruskals.o: kruskals.c utils.h constants.h
+recursive_backtrack.o: recursive_backtrack.c utils.h constants.h
+utils.o: utils.c constants.h
+
+%.o:
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM) -c $< -o $@
 
 # Makes libraylib.a to be used as a static library
 libraylib:
@@ -99,11 +108,6 @@ ifeq ($(PLATFORM_OS),LINUX)
 else
 	cd ../raylib/src; make
 endif
-
-# Generic compilation pattern
-# NOTE: Examples must be ready for Android compilation!
-%: %.c
-	$(CC) -o $@$(EXT) $< $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
 
 # Clean everything
 clean:
