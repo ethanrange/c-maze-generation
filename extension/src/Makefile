@@ -18,6 +18,10 @@ RAYLIB_H_INSTALL_PATH = ../raylib/
 
 RAYLIB_RELEASE_PATH 	?= $(RAYLIB_PATH)/src
 
+# Directories for object and binary output files
+OBJDIR	=	../obj
+BINDIR	=	../bin
+
 # Define default C compiler: gcc
 # NOTE: define g++ compiler if using C++
 CC = gcc
@@ -35,12 +39,6 @@ MAKE = make
 #  -Wno-missing-braces  ignore invalid warning (GCC bug 53119)
 #  -D_DEFAULT_SOURCE    use with -std=c99 on Linux and PLATFORM_WEB, required for timespec
 CFLAGS = -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -s -O
-
-ifeq ($(PLATFORM_OS),LINUX)
-		ifeq ($(RAYLIB_LIBTYPE),STATIC)
-			CFLAGS += -D_DEFAULT_SOURCE
-		endif
-endif
 
 # Define include paths for required headers
 # NOTE: Some external/extras libraries could be required (stb, physac, easings...)
@@ -87,20 +85,30 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 	endif
 endif
 
+_MAIN	=	main.o utils.o prims.o kruskals.o recursive_backtrack.o dijkstras.o visualiser.o
+MAIN	=	$(patsubst %,$(OBJDIR)/%,$(_MAIN))
+
 # Default target entry
-all:	libraylib main
+all:	libraylib $(BINDIR)/main
 
-main:	main.o utils.o prims.o kruskals.o recursive_backtrack.o dijkstras.o visualiser.o
+$(BINDIR)/main:	$(MAIN)
 
-main.o:	main.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
-utils.o:	utils.c constants.h utils.h
-prims.o:	prims.c constants.h utils.h prims.h
-kruskals.o:	kruskals.c constants.h utils.h kruskals.h
-recursive_backtrack.o:	recursive_backtrack.c constants.h utils.h recursive_backtrack.h
-dijkstras.o:	dijkstras.c constants.h utils.h dijkstras.h
-visualiser.o:	visualiser.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
+# Compile binary executables to bin; create directory if it doesn't exist
+$(BINDIR)/%:
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM) $^ -o $@
 
-%.o:
+$(OBJDIR)/main.o:	main.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
+$(OBJDIR)/utils.o:	utils.c constants.h utils.h
+$(OBJDIR)/prims.o:	prims.c constants.h utils.h prims.h
+$(OBJDIR)/kruskals.o:	kruskals.c constants.h utils.h kruskals.h
+$(OBJDIR)/recursive_backtrack.o:	recursive_backtrack.c constants.h utils.h recursive_backtrack.h
+$(OBJDIR)/dijkstras.o:	dijkstras.c constants.h utils.h dijkstras.h
+$(OBJDIR)/visualiser.o:	visualiser.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
+
+# Compile object files to obj; create directory if it doesn't exist
+$(OBJDIR)/%.o:
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM) -c $< -o $@
 
 # Makes libraylib.a to be used as a static library
@@ -113,12 +121,4 @@ endif
 
 # Clean everything
 clean:
-ifeq ($(PLATFORM_OS),LINUX)
-	find . -type f -executable -delete
-	rm -fv *.o
-endif
-
-ifeq ($(PLATFORM_OS),OSX)
-	find . -type f -perm +ugo+x -delete
-	rm -f *.o
-endif
+	rm -fv $(BINDIR)/main $(OBJDIR)/*.o
