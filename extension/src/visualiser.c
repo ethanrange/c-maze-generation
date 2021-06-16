@@ -34,11 +34,12 @@ static Player player = {0};
 static RunState state = HALT;
 static int remaining = 0;
 
+/** Initialises the visualiser for the given algorithm. */
 static void init_algorithm(RunState type) {
   // Initialise remaining to non-zero value
   remaining = 1;
 
-  // Reset board for generation algorithms
+  // Reset visualiser for generation algorithms
   if (type != DIJKSTRAS) {
     init_visualiser();
   }
@@ -48,6 +49,7 @@ static void init_algorithm(RunState type) {
   }
 }
 
+/** Performs a single iteration of the given algorithm. */
 static int step_algorithm(RunState type) {
   if (step_functions[type]) {
     SetWindowTitle(step_messages[type]);
@@ -56,6 +58,7 @@ static int step_algorithm(RunState type) {
   return 0;
 }
 
+/** Runs the given algorithm. */
 static void run_algorithm(RunState type) {
   if (run_functions[type]) {
     SetWindowTitle(run_messages[type]);
@@ -63,6 +66,7 @@ static void run_algorithm(RunState type) {
   }
 }
 
+/** Performs a player movement if valid. */
 static void handle_movement(int x_delta, int y_delta) {
   if (valid_pos(tiles, player.position.x + x_delta,
                 player.position.y + y_delta)) {
@@ -71,6 +75,7 @@ static void handle_movement(int x_delta, int y_delta) {
   }
 }
 
+/** Initialises and runs the given algorithm. */
 static void handle_algorithm(RunState type) {
   // Initialise function
   init_algorithm(type);
@@ -87,6 +92,7 @@ static void handle_algorithm(RunState type) {
   }
 }
 
+/** Sets the visualiser into a halt state. */
 static void halt_visualiser(void) {
   SetWindowTitle(DEFAULT_WINDOW_TITLE); // reset window title
   state = HALT;
@@ -170,7 +176,10 @@ void update_visualiser(void) {
     Vector2 position = GetMousePosition();
     Tile *selected = tile_from_pos(tiles, position.x, position.y);
 
-    selected->type = GOAL;
+    // Check that goal isn't on a wall
+    if (selected->type != WALL) {
+      selected->type = GOAL;
+    }
   }
 }
 
