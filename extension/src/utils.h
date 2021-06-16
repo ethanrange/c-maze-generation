@@ -7,8 +7,6 @@
 #include "constants.h"
 #include "raylib.h"
 
-typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, ENDING } GameScreen;
-
 typedef enum RunState {
   HALT,
   PRIMS,

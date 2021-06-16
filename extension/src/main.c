@@ -77,7 +77,7 @@ static int step_algorithm(RunState type) {
 
 static void run_algorithm(RunState type) {
   if (run_funcs[type]) {
-    return (*run_funcs[type])(tiles);
+    (*run_funcs[type])(tiles);
   }
 }
 
@@ -102,7 +102,7 @@ static void handle_algorithm(RunState type) {
       run_algorithm(type);
     }
   }
-};
+}
 
 void init_game(void) {
 
