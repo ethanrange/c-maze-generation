@@ -88,17 +88,17 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 endif
 
 # Default target entry
-all: libraylib main
+all:	libraylib main
 
-main: main.o visualiser.o prims.o kruskals.o recursive_backtrack.o utils.o dijkstras.o
+main:	main.o utils.o prims.o kruskals.o recursive_backtrack.o dijkstras.o visualiser.o
 
-main.o: main.c visualiser.h constants.h kruskals.h prims.h recursive_backtrack.h utils.h
-visualiser.o:	visualiser.c constants.h kruskals.h prims.h recursive_backtrack.h utils.h
-prims.o: prims.c utils.h constants.h
-kruskals.o: kruskals.c utils.h constants.h
-recursive_backtrack.o: recursive_backtrack.c utils.h constants.h
-dijkstras.o: dijkstras.c utils.h constants.h
-utils.o: utils.c constants.h
+main.o:	main.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
+utils.o:	utils.c constants.h utils.h
+prims.o:	prims.c constants.h utils.h prims.h
+kruskals.o:	kruskals.c constants.h utils.h kruskals.h
+recursive_backtrack.o:	recursive_backtrack.c constants.h utils.h recursive_backtrack.h
+dijkstras.o:	dijkstras.c constants.h utils.h dijkstras.h
+visualiser.o:	visualiser.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
 
 %.o:
 	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM) -c $< -o $@
