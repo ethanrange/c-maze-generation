@@ -96,7 +96,7 @@ $(BINDIR)/main:	$(MAIN)
 # Compile binary executables to bin; create directory if it doesn't exist
 $(BINDIR)/%:
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM) $^ -o $@
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJDIR)/main.o:	main.c constants.h utils.h prims.h kruskals.h recursive_backtrack.h dijkstras.h visualiser.h
 $(OBJDIR)/utils.o:	utils.c constants.h utils.h
