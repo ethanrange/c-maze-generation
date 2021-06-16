@@ -137,6 +137,8 @@ void init_visualiser(void) {
 
   player.position.x = start->position.x;
   player.position.y = start->position.y;
+
+  start->type = START;
 }
 
 void update_visualiser(void) {
