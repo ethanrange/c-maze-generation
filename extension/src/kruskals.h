@@ -1,8 +1,6 @@
-#include <string.h>
-
-#include "constants.h"
-#include "raylib.h"
-#include "utils.h"
+// kruskals.h requires "raylib.h"
+// kruskals.h requires "constants.h"
+// kruskals.h requires "utils.h"
 
 /**
  * Initialises the required variables for Kruskal's algorithm.

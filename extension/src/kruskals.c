@@ -1,5 +1,10 @@
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "raylib.h"
+#include "constants.h"
+#include "utils.h"
 #include "kruskals.h"
 
 static Tile *walls[ROWS * COLS] = {0};

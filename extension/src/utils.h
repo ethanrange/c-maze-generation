@@ -1,11 +1,5 @@
-#ifndef UTILS
-#define UTILS
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "constants.h"
-#include "raylib.h"
+// utils.h requires "raylib.h"
+// utils.h requires "constants.h"
 
 /** Represents the current state (halted or an algorithm) of the visualiser. */
 typedef enum RunState {
@@ -119,5 +113,3 @@ int rand_int(int min, int max);
  * distance from the current coordinates, false otherwise.
  */
 bool valid_tile(int i, int j, Vector2 coords, int dist);
-
-#endif

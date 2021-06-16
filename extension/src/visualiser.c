@@ -1,12 +1,13 @@
 #include <assert.h>
+#include <stdlib.h>
 
-#include "constants.h"
-#include "dijkstras.h"
-#include "kruskals.h"
-#include "prims.h"
 #include "raylib.h"
-#include "recursive_backtrack.h"
+#include "constants.h"
 #include "utils.h"
+#include "prims.h"
+#include "kruskals.h"
+#include "recursive_backtrack.h"
+#include "dijkstras.h"
 #include "visualiser.h"
 
 /* Function pointers for stepping, initialising, and running algorithms. */

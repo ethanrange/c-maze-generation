@@ -1,5 +1,9 @@
 #include <assert.h>
+#include <stdlib.h>
 
+#include "raylib.h"
+#include "constants.h"
+#include "utils.h"
 #include "prims.h"
 
 static Tile *fringe[ROWS * COLS] = {0};

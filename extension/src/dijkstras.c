@@ -1,3 +1,8 @@
+#include <stdlib.h>
+
+#include "raylib.h"
+#include "constants.h"
+#include "utils.h"
 #include "dijkstras.h"
 
 static Tile *fringe[ROWS * COLS] = {0};

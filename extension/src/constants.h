@@ -1,7 +1,4 @@
-#ifndef CONSTANTS
-#define CONSTANTS
-
-#include "raylib.h"
+// constants.h requires "raylib.h"
 
 #define DEFAULT_WINDOW_TITLE "Maze Generation Visualiser"
 
@@ -18,5 +15,3 @@ static const int screen_height = TILE_WIDTH * ROWS;
 
 static const Color colours[8] = {DARKGRAY, GRAY,  RED,    GRAY,
                                  BLUE,     GREEN, ORANGE, PURPLE};
-
-#endif
