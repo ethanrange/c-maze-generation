@@ -5,10 +5,11 @@
 // visualiser.h requires "kruskals.h"
 // visualiser.h requires "recursive_backtrack.h"
 // visualiser.h requires "dijkstras.h"
+// visualiser.h requires "solve_tests.h"
 
 typedef int (*StepFuncPtr)(Tile[ROWS][COLS]);
 typedef void (*InitFuncPtr)(Tile[ROWS][COLS], Player);
-typedef void (*RunFuncPtr)(Tile[ROWS][COLS]);
+typedef bool (*RunFuncPtr)(Tile[ROWS][COLS]);
 
 /** Initialises the tiles and start position of the visualiser. */
 void init_visualiser(void);

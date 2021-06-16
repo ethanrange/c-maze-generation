@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "raylib.h"
 #include "constants.h"
@@ -69,11 +70,14 @@ static int step_algorithm(RunState type) {
 }
 
 /** Runs the given algorithm. */
-static void run_algorithm(RunState type) {
+static bool run_algorithm(RunState type) {
   if (run_functions[type]) {
     SetWindowTitle(run_messages[type]);
-    (*run_functions[type])(tiles);
+    return (*run_functions[type])(tiles);
   }
+
+  // Return unsucessful
+  return false;
 }
 
 /** Performs a player movement if valid. */
@@ -86,7 +90,7 @@ static void handle_movement(int x_delta, int y_delta) {
 }
 
 /** Initialises and runs the given algorithm. */
-static void handle_algorithm(RunState type) {
+static bool handle_algorithm(RunState type) {
   // Initialise function
   init_algorithm(type);
 
@@ -97,9 +101,12 @@ static void handle_algorithm(RunState type) {
     if (IsKeyDown(KEY_LEFT_SHIFT)) {
       state = state ? HALT : type;
     } else {
-      run_algorithm(type);
+      return run_algorithm(type);
     }
   }
+
+  // Return unsucessful
+  return false;
 }
 
 /** Sets the visualiser into a halt state. */
@@ -108,6 +115,29 @@ static void halt_visualiser(void) {
   state = HALT;
 }
 
+/** Tests the given algorithm runs times */
+static void test_algorithm(RunState type, int runs) {
+  int success = 0;
+
+  for (int i = 0; i < runs; i++) {
+    // Run generation algorithm
+    handle_algorithm(type);
+
+    // Set top right to goal
+    tiles[1][COLS - 2].type = GOAL;
+
+    // Increment if successfully reached goal
+    if (handle_algorithm(DIJKSTRAS)) {
+      success++;
+    }
+  }
+
+  if (success == runs) {
+    printf("SUCCESS: %i / %i generated mazes were solved\n", success, runs);
+  } else {
+    printf("FAILURE: %i / %i generated mazes were solved\n", success, runs);
+  }
+}
 
 void init_visualiser(void) {
   // Initialise tiles
@@ -169,6 +199,15 @@ void update_visualiser(void) {
     // Re-initialise visualiser
     init_visualiser();
     return;
+  }
+
+  // Test each algorithm 1000 times
+  if (IsKeyPressed('T')) {
+    printf("\n================================================\n");
+    test_algorithm(PRIMS, 1000);
+    test_algorithm(KRUSKALS, 1000);
+    test_algorithm(RECURSIVE_BACKTRACK, 1000);
+    printf("================================================\n");
   }
 
   // Handle player movement

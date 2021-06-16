@@ -24,5 +24,6 @@ int step_kruskals(Tile tiles[ROWS][COLS]);
  * Runs the randomised Kruskal's algorithm.
  *
  * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return Returns bool to indicate success
  */
-void run_kruskals(Tile tiles[ROWS][COLS]);
+bool run_kruskals(Tile tiles[ROWS][COLS]);
