@@ -34,7 +34,7 @@ MAKE = make
 #  -std=gnu99           defines C language mode (GNU C from 1999 revision)
 #  -Wno-missing-braces  ignore invalid warning (GCC bug 53119)
 #  -D_DEFAULT_SOURCE    use with -std=c99 on Linux and PLATFORM_WEB, required for timespec
-CFLAGS = -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -s -O1
+CFLAGS = -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -Wno-unused-command-line-argument -Werror -pedantic -s -O
 
 ifeq ($(PLATFORM_OS),LINUX)
 		ifeq ($(RAYLIB_LIBTYPE),STATIC)
@@ -90,9 +90,10 @@ endif
 # Default target entry
 all: libraylib main
 
-main: main.o prims.o kruskals.o recursive_backtrack.o utils.o dijkstras.o
+main: main.o visualiser.o prims.o kruskals.o recursive_backtrack.o utils.o dijkstras.o
 
-main.o: main.c constants.h kruskals.h prims.h recursive_backtrack.h utils.h
+main.o: main.c visualiser.h constants.h kruskals.h prims.h recursive_backtrack.h utils.h
+visualiser.o:	visualiser.c constants.h kruskals.h prims.h recursive_backtrack.h utils.h
 prims.o: prims.c utils.h constants.h
 kruskals.o: kruskals.c utils.h constants.h
 recursive_backtrack.o: recursive_backtrack.c utils.h constants.h
