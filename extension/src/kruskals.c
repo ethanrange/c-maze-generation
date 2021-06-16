@@ -1,3 +1,10 @@
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "raylib.h"
+#include "constants.h"
+#include "utils.h"
 #include "kruskals.h"
 
 static Tile *walls[ROWS * COLS] = {0};
@@ -5,6 +12,7 @@ static int wall_index = 0;
 
 int parent[ROWS * COLS] = {0};
 
+// Get id from repeated parent lookups
 static int get_id(int id) {
   while (parent[id]) {
     id = parent[id];
@@ -13,31 +21,31 @@ static int get_id(int id) {
   return id;
 }
 
-void init_kruskals(Tile tile[ROWS][COLS]) {
+// Unused player argument passed to unify types into function pointer array
+void init_kruskals(Tile tiles[ROWS][COLS], Player player) {
   // Logically clear walls array
   wall_index = 0;
 
-  // Reset parent array
+  // Reset parent array to zeros
   memset(parent, 0, sizeof(parent));
 
   // Add horizontal walls to walls list
   for (int i = 1; i < ROWS - 1; i += 2) {
     for (int j = 2; j < COLS - 2; j += 2) {
-      add_element(&tile[i][j], walls, &wall_index);
+      add_element(&tiles[i][j], walls, &wall_index);
     }
   }
 
   // Add vertical walls to walls list
   for (int i = 2; i < ROWS - 2; i += 2) {
     for (int j = 1; j < COLS - 1; j += 2) {
-      add_element(&tile[i][j], walls, &wall_index);
+      add_element(&tiles[i][j], walls, &wall_index);
     }
   }
-
-  printf("Initialised Kruskals\n");
 }
 
-int step_kruskals(Tile tile[ROWS][COLS]) {
+int step_kruskals(Tile tiles[ROWS][COLS]) {
+  // Select random wall
   int random_index = rand() % wall_index;
   Tile *random_wall = walls[random_index];
 
@@ -50,11 +58,8 @@ int step_kruskals(Tile tile[ROWS][COLS]) {
   // Add neighbouring tiles
   for (int i = -1; i < 2; i++) {
     for (int j = -1; j < 2; j++) {
-      if (abs(i) + abs(j) == 1 &&
-          (coords.y + i >= 0 && (int)coords.y + i < ROWS) &&
-          (coords.x + j >= 0 && (int)coords.x + j < COLS)) {
-
-        Tile *neighbour = &tile[(int)coords.y + i][(int)coords.x + j];
+      if (valid_tile(i, j, coords, 1)) {
+        Tile *neighbour = &tiles[(int)coords.y + i][(int)coords.x + j];
 
         if (neighbour->type != WALL) {
           neighbours[neighbours_index] = neighbour;
@@ -85,10 +90,10 @@ int step_kruskals(Tile tile[ROWS][COLS]) {
   return wall_index;
 }
 
-void run_kruskals(Tile tile[ROWS][COLS]) {
-  printf("Running Kruskals\n");
-  
-  while (wall_index) {
-    step_kruskals(tile);
+void run_kruskals(Tile tiles[ROWS][COLS]) {
+  assert(wall_index >= 0);
+
+  while (wall_index > 0) {
+    step_kruskals(tiles);
   }
 }

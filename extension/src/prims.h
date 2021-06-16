@@ -1,9 +1,27 @@
-#include "constants.h"
-#include "raylib.h"
-#include "utils.h"
+// prims.h requires "raylib.h"
+// prims.h requires "constants.h"
+// prims.h requires "utils.h"
 
-void init_prims(Tile tile[ROWS][COLS], Player player);
+/**
+ * Initialises the required variables for Prim's algorithm.
+ *
+ * @param[in] tiles The visualiser's grid of tiles.
+ * @param[in] player The player.
+ */
+void init_prims(Tile tiles[ROWS][COLS], Player player);
 
-int step_prims(Tile tile[ROWS][COLS]);
+/**
+ * Performs a single iteration of Prim's algorithm.
+ *
+ * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return The number of fringe tiles remaining. Zero signifies the algorithm is
+ * complete.
+ */
+int step_prims(Tile tiles[ROWS][COLS]);
 
-void run_prims(Tile tile[ROWS][COLS], Player player);
+/**
+ * Runs the randomised Prim's algorithm.
+ *
+ * @param[in,out] tiles The visualiser's grid of tiles.
+ */
+void run_prims(Tile tiles[ROWS][COLS]);

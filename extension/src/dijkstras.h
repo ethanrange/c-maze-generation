@@ -1,8 +1,27 @@
-#include "utils.h"
-#include "constants.h"
+// dijkstras.h requires "raylib.h"
+// dijkstras.h requires "constants.h"
+// dijkstras.h requires "utils.h"
 
-void init_dijkstras(Tile tile[ROWS][COLS], Player player);
+/**
+ * Initialises the required variables for Dijkstra's algorithm.
+ *
+ * @param[in] tiles The visualiser's grid of tiles.
+ * @param player The player.
+ */
+void init_dijkstras(Tile tiles[ROWS][COLS], Player player);
 
-int step_dijkstras(Tile tile[ROWS][COLS]);
+/**
+ * Performs a single iteration of Dijkstra's algorithm.
+ *
+ * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return The number of fringe tiles remaining to search. Zero signifies the
+ * search is complete.
+ */
+int step_dijkstras(Tile tiles[ROWS][COLS]);
 
-void run_dijkstras(Tile tile[ROWS][COLS], Player player);
+/**
+ * Runs Dijkstra's algorithm for maze-solving.
+ *
+ * @param[in,out] tiles The visualiser's grid of tiles.
+ */
+void run_dijkstras(Tile tiles[ROWS][COLS]);
