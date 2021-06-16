@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "visualiser.h"
 
+/* Function pointers for stepping, initialising, and running algorithms. */
 static const StepFuncPtr step_functions[5] = {NULL, step_prims, step_kruskals,
                                               NULL, step_dijkstras};
 static const InitFuncPtr init_functions[5] = {NULL, init_prims, init_kruskals,
@@ -16,6 +17,7 @@ static const InitFuncPtr init_functions[5] = {NULL, init_prims, init_kruskals,
 static const RunFuncPtr run_functions[5] = {NULL, run_prims, run_kruskals, NULL,
                                             run_dijkstras};
 
+/* Window status messages for each algorithm type. */
 static const char *step_messages[5] = {
     NULL, "Visualising randomised Prim's maze-generation algorithm...",
     "Visualising randomised Kruskal's maze-generation algorithm...", NULL,
@@ -27,12 +29,19 @@ static const char *run_messages[5] = {
     "Ran recursive backtrack (randomised DFS) maze-generation algorithm",
     "Ran Dijkstra's pathfinding algorithm"};
 
+
+/** The visualiser's grid of tiles. */
 static Tile tiles[ROWS][COLS] = {0};
 
+/** The 'player', i.e. starting point for certain algorithms. */
 static Player player = {0};
 
+/** The current state of the visualiser. Initialised as halted. */
 static RunState state = HALT;
+
+/** The remaining steps for stepping through (visualising) algorithms. */
 static int remaining = 0;
+
 
 /** Initialises the visualiser for the given algorithm. */
 static void init_algorithm(RunState type) {
@@ -98,6 +107,7 @@ static void halt_visualiser(void) {
   state = HALT;
 }
 
+
 void init_visualiser(void) {
   // Initialise tiles
   for (int i = 0; i < ROWS; i++) {
@@ -126,8 +136,6 @@ void init_visualiser(void) {
 
   player.position.x = start->position.x;
   player.position.y = start->position.y;
-
-  start->type = START;
 }
 
 void update_visualiser(void) {
