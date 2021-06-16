@@ -1,3 +1,8 @@
+#include <stdlib.h>
+
+#include "raylib.h"
+#include "constants.h"
+#include "utils.h"
 #include "recursive_backtrack.h"
 
 static void recursive_backtrack(Tile tiles[ROWS][COLS], Tile *current) {

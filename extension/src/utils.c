@@ -1,3 +1,9 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "raylib.h"
+#include "constants.h"
 #include "utils.h"
 
 void add_element(Tile *element, Tile *array[], int *size) {

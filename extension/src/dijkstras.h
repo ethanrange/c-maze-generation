@@ -1,5 +1,6 @@
-#include "constants.h"
-#include "utils.h"
+// dijkstras.h requires "raylib.h"
+// dijkstras.h requires "constants.h"
+// dijkstras.h requires "utils.h"
 
 /**
  * Initialises the required variables for Dijkstra's algorithm.

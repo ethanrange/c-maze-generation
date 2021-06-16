@@ -1,6 +1,6 @@
-#include "constants.h"
-#include "raylib.h"
-#include "utils.h"
+// prims.h requires "raylib.h"
+// prims.h requires "constants.h"
+// prims.h requires "utils.h"
 
 /**
  * Initialises the required variables for Prim's algorithm.
