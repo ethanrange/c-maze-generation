@@ -7,19 +7,18 @@
 #include "utils.h"
 #include "visualiser.h"
 
-static int (*step_funcs[5])() = {NULL, step_prims, step_kruskals, NULL,
-                                 step_dijkstras};
-static void (*init_funcs[5])() = {NULL, init_prims, init_kruskals, NULL,
-                                  init_dijkstras};
-static void (*run_funcs[5])() = {NULL, run_prims, run_kruskals, NULL,
-                                 run_dijkstras};
-
+static const StepFuncPtr step_functions[5] = {NULL, step_prims, step_kruskals,
+                                              NULL, step_dijkstras};
+static const InitFuncPtr init_functions[5] = {NULL, init_prims, init_kruskals,
+                                              NULL, init_dijkstras};
+static const RunFuncPtr run_functions[5] = {NULL, run_prims, run_kruskals, NULL,
+                                            run_dijkstras};
 
 static Tile tiles[ROWS][COLS] = {0};
 
 static Player player = {0};
 
-static RunState run = HALT;
+static RunState state = HALT;
 static int remaining = 0;
 
 static void init_algorithm(RunState type) {
@@ -31,22 +30,21 @@ static void init_algorithm(RunState type) {
     init_visualiser();
   }
 
-  if (init_funcs[type]) {
-    (*init_funcs[type])(tiles, player);
+  if (init_functions[type]) {
+    (*init_functions[type])(tiles, player);
   }
 }
 
 static int step_algorithm(RunState type) {
-  if (step_funcs[type]) {
-    return (*step_funcs[type])(tiles);
+  if (step_functions[type]) {
+    return (*step_functions[type])(tiles);
   }
-
   return 0;
 }
 
 static void run_algorithm(RunState type) {
-  if (run_funcs[type]) {
-    (*run_funcs[type])(tiles);
+  if (run_functions[type]) {
+    (*run_functions[type])(tiles);
   }
 }
 
@@ -66,7 +64,7 @@ static void handle_algorithm(RunState type) {
     run_recursive_backtrack(tiles, player);
   } else {
     if (IsKeyDown(KEY_LEFT_SHIFT)) {
-      run = run ? HALT : type;
+      state = state ? HALT : type;
     } else {
       run_algorithm(type);
     }
@@ -74,12 +72,11 @@ static void handle_algorithm(RunState type) {
 }
 
 void init_visualiser(void) {
-
   // Initialise tiles
   for (int i = 0; i < ROWS; i++) {
     for (int j = 0; j < COLS; j++) {
       tiles[i][j].position = (Vector2){j * tile_size.x + tile_size.x / 2,
-                                      i * tile_size.y + tile_size.y / 2};
+                                       i * tile_size.y + tile_size.y / 2};
 
       tiles[i][j].type = PASSAGE;
 
@@ -106,39 +103,32 @@ void init_visualiser(void) {
   start->type = START;
 }
 
-// Update game (one frame)
 void update_visualiser(void) {
   // Only start an algorithm if not currently running
-  if (run == HALT) {
+  if (state == HALT) {
     if (IsKeyPressed('P')) {
-      // Prims
       handle_algorithm(PRIMS);
     } else if (IsKeyPressed('K')) {
-      // Kruskals
       handle_algorithm(KRUSKALS);
     } else if (IsKeyPressed('B')) {
-      // Recursive backtracking
       handle_algorithm(RECURSIVE_BACKTRACK);
     } else if (IsKeyPressed('D')) {
-      // Dijkstras
       handle_algorithm(DIJKSTRAS);
     }
-  }
-
-  if (run != HALT) {
+  } else {
     if (remaining) {
-      remaining = step_algorithm(run);
+      remaining = step_algorithm(state);
     } else {
-      run = HALT;
+      state = HALT;
     }
   }
 
   // Reload maze
   if (IsKeyPressed('R')) {
     // Stop any current runs
-    run = HALT;
+    state = HALT;
 
-    // Reinitialise game
+    // Re-initialise visualiser
     init_visualiser();
     return;
   }
@@ -179,9 +169,9 @@ void draw_visualiser(void) {
   }
 
   // Draw player
-  DrawRectangle(player.position.x - player_size.x / 2,
-                player.position.y - player_size.y / 2, player_size.x,
-                player_size.y, RED);
+  DrawRectangle(player.position.x - tile_size.x / 2,
+                player.position.y - tile_size.y / 2, tile_size.x, tile_size.y,
+                RED);
 
   EndDrawing();
 }

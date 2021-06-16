@@ -87,6 +87,8 @@ bool valid_pos(Tile tiles[ROWS][COLS], int x, int y) {
 // Generate a random integer between min and max inclusive
 int rand_int(int min, int max) { return (rand() % (max - min + 1)) + min; }
 
+// check if in bounds
+// and manhattan distance
 bool valid_tile(int i, int j, Vector2 coords, int dist) {
   return (abs(i) + abs(j) == dist &&
           (coords.y + i >= 0 && coords.y + i < ROWS) &&

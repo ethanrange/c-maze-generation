@@ -19,13 +19,13 @@ int main(void) {
   // Initialise window
   InitWindow(screen_width, screen_height, "Maze Generation");
 
-  // Initialise game
+  // Initialise visualiser
   init_visualiser();
 
   // Target 60FPS
   SetTargetFPS(60);
 
-  // Main game loop
+  // Main visualiser loop
   while (!WindowShouldClose()) {
     // Update and draw one frame
     update_visualiser();
