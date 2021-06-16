@@ -23,5 +23,6 @@ int step_prims(Tile tiles[ROWS][COLS]);
  * Runs the randomised Prim's algorithm.
  *
  * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return Returns bool to indicate success
  */
-void run_prims(Tile tiles[ROWS][COLS]);
+bool run_prims(Tile tiles[ROWS][COLS]);

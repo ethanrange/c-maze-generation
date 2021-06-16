@@ -69,11 +69,14 @@ int step_dijkstras(Tile tiles[ROWS][COLS]) {
   return fringe_index;
 }
 
-void run_dijkstras(Tile tiles[ROWS][COLS]) {
+bool run_dijkstras(Tile tiles[ROWS][COLS]) {
   int cont = 1;
 
   // While steps remaining and fringe tiles left to search
   while (cont > 0) {
     cont = step_dijkstras(tiles);
   }
+
+  // Return whether finish was found
+  return (fringe_index != cont);
 }

@@ -44,7 +44,10 @@ static void recursive_backtrack(Tile tiles[ROWS][COLS], Tile *current) {
   }
 }
 
-void run_recursive_backtrack(Tile tiles[ROWS][COLS], Player player) {
+bool run_recursive_backtrack(Tile tiles[ROWS][COLS], Player player) {
   Tile *start = tile_from_pos(tiles, player.position.x, player.position.y);
   recursive_backtrack(tiles, start);
+
+  // Returns true indicating success
+  return true;
 }

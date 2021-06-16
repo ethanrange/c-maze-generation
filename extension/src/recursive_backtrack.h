@@ -7,5 +7,6 @@
  * algorithm).
  *
  * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return Returns bool to indicate success
  */
-void run_recursive_backtrack(Tile tiles[ROWS][COLS], Player player);
+bool run_recursive_backtrack(Tile tiles[ROWS][COLS], Player player);

@@ -23,5 +23,6 @@ int step_dijkstras(Tile tiles[ROWS][COLS]);
  * Runs Dijkstra's algorithm for maze-solving.
  *
  * @param[in,out] tiles The visualiser's grid of tiles.
+ * @return Returns true if algorithm reaches a goal tile
  */
-void run_dijkstras(Tile tiles[ROWS][COLS]);
+bool run_dijkstras(Tile tiles[ROWS][COLS]);
