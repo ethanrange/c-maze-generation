@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "constants.h"
 #include "dijkstras.h"
 #include "kruskals.h"
@@ -13,6 +15,17 @@ static const InitFuncPtr init_functions[5] = {NULL, init_prims, init_kruskals,
                                               NULL, init_dijkstras};
 static const RunFuncPtr run_functions[5] = {NULL, run_prims, run_kruskals, NULL,
                                             run_dijkstras};
+
+static const char *step_messages[5] = {
+    NULL, "Visualising randomised Prim's maze-generation algorithm...",
+    "Visualising randomised Kruskal's maze-generation algorithm...", NULL,
+    "Visualising Dijkstra's pathfinding algorithm..."};
+
+static const char *run_messages[5] = {
+    NULL, "Ran randomised Prim's maze-generation algorithm",
+    "Ran randomised Kruskal's maze-generation algorithm",
+    "Ran recursive backtrack (randomised DFS) maze-generation algorithm",
+    "Ran Dijkstra's pathfinding algorithm"};
 
 static Tile tiles[ROWS][COLS] = {0};
 
@@ -37,6 +50,7 @@ static void init_algorithm(RunState type) {
 
 static int step_algorithm(RunState type) {
   if (step_functions[type]) {
+    SetWindowTitle(step_messages[type]);
     return (*step_functions[type])(tiles);
   }
   return 0;
@@ -44,6 +58,7 @@ static int step_algorithm(RunState type) {
 
 static void run_algorithm(RunState type) {
   if (run_functions[type]) {
+    SetWindowTitle(run_messages[type]);
     (*run_functions[type])(tiles);
   }
 }
@@ -61,6 +76,7 @@ static void handle_algorithm(RunState type) {
   init_algorithm(type);
 
   if (type == RECURSIVE_BACKTRACK) {
+    SetWindowTitle(run_messages[type]);
     run_recursive_backtrack(tiles, player);
   } else {
     if (IsKeyDown(KEY_LEFT_SHIFT)) {
@@ -69,6 +85,11 @@ static void handle_algorithm(RunState type) {
       run_algorithm(type);
     }
   }
+}
+
+static void halt_visualiser(void) {
+  SetWindowTitle(DEFAULT_WINDOW_TITLE); // reset window title
+  state = HALT;
 }
 
 void init_visualiser(void) {
@@ -119,14 +140,14 @@ void update_visualiser(void) {
     if (remaining) {
       remaining = step_algorithm(state);
     } else {
-      state = HALT;
+      halt_visualiser();
     }
   }
 
   // Reload maze
   if (IsKeyPressed('R')) {
     // Stop any current runs
-    state = HALT;
+    halt_visualiser();
 
     // Re-initialise visualiser
     init_visualiser();

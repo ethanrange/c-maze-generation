@@ -3,7 +3,7 @@
 
 #include "raylib.h"
 
-// Screen width and height depend on the tile width
+/* Screen width and height depend on the tile width */
 #define TILE_WIDTH 36
 
 #define ROWS 25
@@ -16,5 +16,7 @@ static const int screen_height = TILE_WIDTH * ROWS;
 
 static const Color colours[8] = {DARKGRAY, GRAY,  RED,    GRAY,
                                  BLUE,     GREEN, ORANGE, PURPLE};
+
+#define DEFAULT_WINDOW_TITLE "Maze Generation Visualiser"
 
 #endif

@@ -17,7 +17,7 @@ int main(void) {
   srand((unsigned int)time(NULL));
 
   // Initialise window
-  InitWindow(screen_width, screen_height, "Maze Generation");
+  InitWindow(screen_width, screen_height, DEFAULT_WINDOW_TITLE);
 
   // Initialise visualiser
   init_visualiser();
