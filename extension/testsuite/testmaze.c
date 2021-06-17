@@ -8,7 +8,6 @@
 #include "../src/constants.h"
 #include "../src/utils.h"
 
-
 int main( void )
 {
   Vector2 position_11 = {1, 1};
