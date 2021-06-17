@@ -1,25 +1,18 @@
-RAYLIB_PATH = ../raylib/src
+CC      =   gcc
+CFLAGS  =   -Wall
+BUILD	=	testmaze
 
-SRC_PATH = ../src/
-CC      =       gcc
-CFLAGS  =       -Wall -I$(RAYLIB_PATH) -I$(SRC_PATH)
-LIB	    =	utils.a
-LIBOBJS	=	$(SRC_PATH)utils.o
-BUILD	=	testmaze $(LIB)
+all:	make_src $(BUILD)
 
-all:	$(BUILD)
+make_src:
+	cd ../src; make;
 
 clean:
-	rm -f $(BUILD) $(OBJDIR)/*.o core
-
-$(LIB):		$(LIBOBJS)
-	ar rc $(LIB) $(LIBOBJS)
-	ranlib $(LIB)
+	rm -f $(BUILD) $(OBJDIR)/*.o *.a core
 
 test:	$(BUILD)
 	summarisetests ./testmaze
 
-testmaze:	testmaze.o testutils.o utils.a
+testmaze:	testmaze.o testutils.o ../obj/utils.o
 testmaze.o: testutils.h 
 testutils.o:	testutils.h
-utils.o:	utils.c constants.h utils.h 
