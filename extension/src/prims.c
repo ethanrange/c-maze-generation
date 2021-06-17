@@ -61,10 +61,13 @@ int step_prims(Tile tiles[ROWS][COLS]) {
   return fringe_index;
 }
 
-void run_prims(Tile tiles[ROWS][COLS]) {
+bool run_prims(Tile tiles[ROWS][COLS]) {
   assert(fringe_index >= 0);
 
   while (fringe_index > 0) {
     step_prims(tiles);
   }
+
+  // Returns true indicating success
+  return true;
 }

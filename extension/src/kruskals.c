@@ -90,10 +90,13 @@ int step_kruskals(Tile tiles[ROWS][COLS]) {
   return wall_index;
 }
 
-void run_kruskals(Tile tiles[ROWS][COLS]) {
+bool run_kruskals(Tile tiles[ROWS][COLS]) {
   assert(wall_index >= 0);
 
   while (wall_index > 0) {
     step_kruskals(tiles);
   }
+
+  // Returns true indicating success
+  return true;
 }

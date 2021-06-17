@@ -1,25 +1,36 @@
-RAYLIB_PATH = ../raylib/src
+CC      =   gcc
+CFLAGS  =   -Wall
 
-SRC_PATH = ../src/
-CC      =       gcc
-CFLAGS  =       -Wall -I$(RAYLIB_PATH) -I$(SRC_PATH)
-LIB	    =	utils.a
-LIBOBJS	=	$(SRC_PATH)utils.o
-BUILD	=	testmaze $(LIB)
+OBJDIR 	= 	../obj
+BINDIR  =   ../bin
+
+BUILD	=	make_src $(BINDIR)/testmaze
+
+_TESTMAZE   = testmaze.o testutils.o utils.o
+TESTMAZE    = $(patsubst %,$(OBJDIR)/%,$(_TESTMAZE))
 
 all:	$(BUILD)
 
+make_src:
+	cd ../src; make;
+
 clean:
-	rm -f $(BUILD) $(OBJDIR)/*.o core
+	rm -fv $(BUILD) $(OBJDIR)/*.o *.a core
 
-$(LIB):		$(LIBOBJS)
-	ar rc $(LIB) $(LIBOBJS)
-	ranlib $(LIB)
+test: $(BUILD)
+	summarisetests $(BINDIR)/testmaze
 
-test:	$(BUILD)
-	summarisetests ./testmaze
+$(BINDIR)/testmaze: $(TESTMAZE)	
 
-testmaze:	testmaze.o testutils.o utils.a
-testmaze.o: testutils.h 
-testutils.o:	testutils.h
-utils.o:	utils.c constants.h utils.h 
+# Compile binary executables to bin; create directory if it doesn't exist
+$(BINDIR)/%:
+		@mkdir -p $(@D)
+		$(CC) $^ -o $@
+
+$(OBJDIR)/testmaze.o: testmaze.c testutils.h
+$(OBJDIR)/testutils.o: testutils.c testutils.h
+
+# Compile object files to obj; create directory if it doesn't exist
+$(OBJDIR)/%.o:
+		@mkdir -p $(@D)
+		$(CC) $(CFLAGS) -c $< -o $@
