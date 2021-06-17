@@ -18,7 +18,7 @@ clean:
 	rm -fv $(BUILD) $(OBJDIR)/*.o *.a core
 
 test: $(BUILD)
-	summarisetests $(BINDIR)/testmaze
+	./summarisetests $(BINDIR)/testmaze
 
 $(BINDIR)/testmaze: $(TESTMAZE)	
 
