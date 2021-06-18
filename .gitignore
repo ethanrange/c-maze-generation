@@ -11,6 +11,9 @@
 # Unignore testutils
 !summarisetests
 
+# Unignore Presentation PDF
+!doc/Presentation.pdf
+
 # Ignore junk files from compiling C code
 *.o
 
