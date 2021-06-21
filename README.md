@@ -2,7 +2,7 @@
 
 ## About
 
-This repository contains the source code for our Maze generation extension for the Imperial Y1 C Project. Using C and the Rayib game engine, we have implemented 3 maze generation algorithm visualisations, **Randomised Prim's**, **Randomised Kruskal's** and **Recursive Backtracking**, as well as **Dijkstra's pathfinding algorithm**.
+This repository contains the source code for our Maze generation extension for the Imperial Y1 C Project. Using C and the Raylib game engine, we have implemented 3 maze generation algorithm visualisations, **Randomised Prim's**, **Randomised Kruskal's** and **Recursive Backtracking**, as well as **Dijkstra's pathfinding algorithm**.
 
 ## Examples
 
