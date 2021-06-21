@@ -6,7 +6,14 @@ This repository contains the source code for our Maze generation extension for t
 
 ## Examples
 
-**EXAMPLES HERE**
+Prim's Algorithm:
+![Prims Algorithm](images/prims.gif)
+
+Kruskal's Algorithm:
+![Prims Algorithm](images/kruskals.gif)
+
+Dijkstra's Algorithm:
+![Prims Algorithm](images/dijkstras.gif)
 
 ## Getting Started
 
@@ -32,14 +39,15 @@ git clone https://github.com/ethanrange/c-maze-generation.git
 The main program then may be compiled with make in `src`:
 
 ```bash
-cd extension/src
+cd src
 make
+/bin/main
 ```
 
 Units tests may be compiled and run with:
 
 ```bash
-cd extension/testsuite
+cd testsuite
 make test
 ```
 
