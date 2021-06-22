@@ -26,14 +26,20 @@ Ensure that you have the following prerequisites installed:
 * gcc - [Download and install version 9.3.0 +](https://gcc.gnu.org/)
 * make - [Download and install version 4.2.1 +](https://www.gnu.org/software/make/)
 
-A compatible Raylib version is included in the repository. Please note that the Makefile only provides compilation instructions for Linux, WSL and MacOS. Manual generation of the Raylib `librarylib.a` file may be required.
+A compatible Raylib version is included as a submodule in the repository. Please note that the Makefile only provides compilation instructions for Linux, WSL and MacOS. Manual generation of the Raylib `librarylib.a` file may be required.
 
 ### Installation
 
 Firstly clone the repository:
 
 ``` bash
-git clone https://github.com/ethanrange/c-maze-generation.git
+git clone --recurse-submodules https://github.com/ethanrange/c-maze-generation.git
+```
+
+If the project has already been cloned without the `--recurse-submodules` flag, initialise and fetch the raylib submodule with:
+
+```bash
+git submodule update --init
 ```
 
 The main program then may be compiled with make in `src`:
@@ -41,7 +47,7 @@ The main program then may be compiled with make in `src`:
 ```bash
 cd src
 make
-/bin/main
+../bin/main
 ```
 
 Units tests may be compiled and run with:
